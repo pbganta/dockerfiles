@@ -1,0 +1,21 @@
+FROM ubuntu:latest AS base
+
+ENV PYTHONDONTWRITEBYTECODE=1
+
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+RUN apt-get update -qq
+RUN apt-get install -qq --no-install-recommends g++ gcc gfortran openssh-client openssh-server pip bzip2 ca-certificates git unzip wget python3 python3.12-venv python3-tk
+RUN mkdir /home/ubuntu/.local/
+RUN python3 -m venv /home/ubuntu/.local/.venv/
+RUN /home/ubuntu/.local/.venv/bin/pip3 install ase mdanalysis scikit-learn
+ENV PATH=$PATH:/home/ubuntu/.local/.venv/bin/
+RUN echo "alias python3='/home/ubuntu/.local/.venv/bin/python3'" >> ~/.bash_aliases
+RUN echo "echo '******************************\nThis Docker image is a comprehensive toolset including popular python packages Atomic Simulation Environment (ASE), MDAnalysis, and Scikit-learn.\nASE facilitates the manipulation and analysis of atomic and molecular systems, while MDAnalysis is particularly suited for the structural and dynamic analysis of large biomolecular complexes from molecular dynamics simulations.\nAdditionally, the inclusion of Scikit-learn enables the application of various machine learning algorithms for tasks such as classification, regression, and clustering on the analyzed molecular data.\nUse --mount while running to access external files and run python scripts\n******************************'" >> ~/.bashrc
+# Expose the port that the application listens on.
+
+EXPOSE 8000
+
+ENTRYPOINT ["/bin/bash"]
